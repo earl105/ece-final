@@ -145,8 +145,10 @@ void lights(int button){
     bleKeyboard.press(KEY_LEFT_CTRL);
     bleKeyboard.press(KEY_LEFT_ALT);
     bleKeyboard.press('T');
-    delay(500);
-    bleKeyboard.releaseAll();
+    delay(50);
+    bleKeyboard.release(KEY_LEFT_CTRL);
+    bleKeyboard.release(KEY_LEFT_ALT);
+    bleKeyboard.release('T');
     break; 
     case 2:
     Serial.printf("state %d, button %d\n",state,button);
