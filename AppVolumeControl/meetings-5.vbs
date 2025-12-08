@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "meetings-5.exe", 0, True

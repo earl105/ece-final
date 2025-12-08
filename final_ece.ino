@@ -17,16 +17,10 @@ String Lamp2ID = "tall_lamp";
 String Lamp3ID = "null";
 
 //Declare Wifi Credentials
-const char *ssid = "";
-const char *password = "";
+const char *ssid = "norbitches";
+const char *password = "penisballs69";
 
-//AppGroups for App Volume Control
-enum AppGroup {
-  GROUP_1 = 1,  // Chrome, Arc, Zen, Edge, Firefox
-  GROUP_2 = 2,  // Discord, Zoom, Teams
-  GROUP_3 = 3   // Spotify
-};
-AppGroup currentGroup = GROUP_1;
+
 
 //Setup Keyboard
 BleKeyboard bleKeyboard("ESP32 Keyboard");
@@ -101,9 +95,6 @@ const int resolution = 8;
 
 // mode
 int state = 1;
-
-
-
 
 //buttons
 DebouncedButton b1(btn1);
@@ -258,55 +249,30 @@ void togglePlug(KASASmartPlug *plug) {
 //--------------------
 
 
-void selectGroup(AppGroup g) {
-  currentGroup = g;
-  Serial.print("Selected Group: ");
-  Serial.println((int)g);
-}
-
 void groupVolume(int button) {
   switch (button) {
-    case 1: selectGroup(GROUP_1); break;  // Chrome/etc
-    case 2: selectGroup(GROUP_2); break;  // Discord/Zoom/Teams
-    case 3: selectGroup(GROUP_3); break;  // Spotify
+    case 1:
+      bleKeyboard.press('F13');//F13 for volume group 1
+      delay(100);
+      bleKeyboard.releaseAll();
+      Serial.println("Group 1 Selected - Browsers");
+       break;  // Chrome/etc
+    case 2:
+      bleKeyboard.press('F14');//F14 for volume group 2
+      delay(100);
+      bleKeyboard.releaseAll();
+      Serial.println("Group 1 Selected - Meetings");
+       break;  // Discord/Zoom/Teams
+    case 3: 
+      bleKeyboard.press('F15');//F15 for volume group 3
+      delay(100);
+      bleKeyboard.releaseAll();
+      Serial.println("Group 1 Selected - Music");
+       break;  // Spotify
     default: Serial.println("Invalid group button"); break;
   }
 }
 
-
-void sendVolumeUp() {
-  switch (currentGroup) {
-    case GROUP_1:
-      bleKeyboard.press(KEY_F13);
-      bleKeyboard.release(KEY_F13);
-      break;
-    case GROUP_2:
-      bleKeyboard.press(KEY_F15);
-      bleKeyboard.release(KEY_F15);
-      break;
-    case GROUP_3:
-      bleKeyboard.press(KEY_F17);
-      bleKeyboard.release(KEY_F17);
-      break;
-  }
-}
-
-void sendVolumeDown() {
-  switch (currentGroup) {
-    case GROUP_1:
-      bleKeyboard.press(KEY_F14);
-      bleKeyboard.release(KEY_F14);
-      break;
-    case GROUP_2:
-      bleKeyboard.press(KEY_F16);
-      bleKeyboard.release(KEY_F16);
-      break;
-    case GROUP_3:
-      bleKeyboard.press(KEY_F18);
-      bleKeyboard.release(KEY_F18);
-      break;
-  }
-}
 
 //--------------------
 //HELPERS
@@ -378,11 +344,15 @@ void handleEncoderRotation() {
 
     case 3:  // Mode 3: App Volume
       if (encoderPos > 0) {
-        sendVolumeUp();
-        Serial.println("Encoder CW -> App Volume Up");
+      bleKeyboard.press('F17'); // F17 for App Volume Up
+      delay(100);
+      bleKeyboard.releaseAll();
+        Serial.println("Encoder CW -> App Group Volume Up");
       } else {
-        sendVolumeDown();
-        Serial.println("Encoder CCW -> App Volume Down");
+        bleKeyboard.press('F16'); // F16 for App Volume Down
+        delay(100);
+        bleKeyboard.releaseAll();
+        Serial.println("Encoder CCW -> App Group Volume Down");
       }
       break;
   }
@@ -422,11 +392,11 @@ void check_rotary(){
 
 
 void loop() {
+
   check_rotary();
   if (encoderPos != 0) {
     handleEncoderRotation();
   }
-
 
 
   //if main button pressed, change mode
