@@ -173,32 +173,26 @@
 
 
   void media(int button) {
-    switch (button) {
-      case 1:
-        printState(button);
-        Serial.println("prev");
-        bleKeyboard.press(KEY_MEDIA_PREVIOUS_TRACK);
-        delay(500);
-        bleKeyboard.releaseAll();
-        break;
-      case 2:
-        printState(button);
-        Serial.println("play/pause");
-        bleKeyboard.press(KEY_MEDIA_PLAY_PAUSE);
-        delay(500);
-        bleKeyboard.releaseAll();
-        break;
-      case 3:
-        printState(button);
-        Serial.println("next");
-        bleKeyboard.press(KEY_MEDIA_NEXT_TRACK);
-        delay(500);
-        bleKeyboard.releaseAll();
-        break;
-      default:
-        Serial.println("invalid button value");
-        break;
-    }
+      switch (button) {
+        case 1:
+          printState(button);
+          bleKeyboard.write(KEY_MEDIA_PREVIOUS_TRACK);
+          Serial.println("Button 1 Pressed -> Previous Track");
+          break;
+        case 2:
+          printState(button);
+          bleKeyboard.write(KEY_MEDIA_PLAY_PAUSE);
+          Serial.println("Button 2 Pressed -> Play/Pause");
+          break;
+        case 3:
+          printState(button);
+          bleKeyboard.write(KEY_MEDIA_NEXT_TRACK);
+          Serial.println("Button 3 Pressed -> Next Track");
+          break;
+        default:
+          Serial.println("invalid button value");
+          break;
+      }
   }
 
 
@@ -276,36 +270,29 @@
   //--------------------
 
   void audioControl(int button){
+    switch (button) {
+      case 1:
+        Serial.println("GROUP_1");
+        Serial.println("Group 1 Selected - Browsers");
+        setColor(255, 0, 0);  // Red
+        break;
 
-  switch(button){
-    case 1:
-    bleKeyboard.press(KEY_LEFT_CTRL);
-    bleKeyboard.press(KEY_LEFT_SHIFT);
-    bleKeyboard.press('2');
-        delay(100);
-        bleKeyboard.releaseAll();
-        Serial.println("toggling audio output");
-    break;
-    case 2:
-    bleKeyboard.press(KEY_MEDIA_MUTE);//for toggle mute 
-        delay(100);
-        bleKeyboard.releaseAll();
-        Serial.println("toggling mute ");
-    break;
-    case 3:
-    bleKeyboard.press(KEY_LEFT_CTRL);
-    bleKeyboard.press(KEY_LEFT_SHIFT);
-    bleKeyboard.press('1');
-    // NOTE* USE POWERTOYS VIDEO CONFERENCE MUTE
-        delay(100);
-        bleKeyboard.releaseAll();
-        Serial.println("toggling mic mute");
-    break;
-    default: Serial.println("Invalid group button"); break;
+      case 2:
+        Serial.println("GROUP_2");
+        Serial.println("Group 2 Selected - Meetings");
+        setColor(0, 255, 0);  // Green
+        break;
 
-  }
+      case 3:
+        Serial.println("GROUP_3");
+        Serial.println("Group 3 Selected - Music");
+        setColor(0, 0, 255);  // Blue
+        break;
 
-
+      default:
+        Serial.println("Invalid group button");
+        break;
+    }
 
   }
 
@@ -384,18 +371,18 @@
         break;
 
       case 3:  // Mode 3: App Volume
-        if (encoderPos > 0) {
-        bleKeyboard.press('F17'); // F17 for App Volume Up
-        delay(100);
-        bleKeyboard.releaseAll();
-          Serial.println("Encoder CW -> App Group Volume Up");
-        } else {
-          bleKeyboard.press('F16'); // F16 for App Volume Down
-          delay(100);
-          bleKeyboard.releaseAll();
-          Serial.println("Encoder CCW -> App Group Volume Down");
-        }
+ if (encoderPos > 0) {
+            Serial.println("VOL_UP");
+            Serial.println("Encoder CW -> Volume Up");
+          } else {
+            Serial.println("VOL_DOWN");
+            Serial.println("Encoder CCW -> Volume Down");
+          }
+      
         break;
+        case 4:  
+         Serial.println("Encoder -> Audio Mode (Placeholder/Undefined)");
+          break;
     }
 
     // Reset encoder position after handling
@@ -433,18 +420,18 @@
 
 
   void loop() {
-    // 1. FAST POLLING: Check the encoder first
+   
     int clkCurrentState = digitalRead(CLK_PIN);
     
     if (clkCurrentState != clkLastState) {
-      if (clkCurrentState == LOW) { // Check on Falling Edge (often cleaner than Rising)
+      if (clkCurrentState == LOW) { 
         if (digitalRead(DT_PIN) == HIGH) {
           encoderPos = -1;
         } else {
           encoderPos = 1;
         }
         
-        // Handle the rotation immediately while we have the pulse caught
+       
         if (encoderPos != 0) {
           handleEncoderRotation(); // Process keys
           encoderPos = 0;          // Reset immediately
@@ -453,9 +440,9 @@
       clkLastState = clkCurrentState;
     }
 
-    // 2. SLOW TASKS: Everything else happens only if we aren't spinning the knob
+
     static unsigned long lastCheck = 0;
-    if (millis() - lastCheck > 20) { // Limit button checks to 50Hz to save CPU
+    if (millis() - lastCheck > 20) { 
       lastCheck = millis();
 
       if (bMain.isPressed()) {
